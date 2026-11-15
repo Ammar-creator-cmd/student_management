@@ -31,7 +31,7 @@ def index():
 
 
 # create : menambah data baru
-@app.route('/add', methods=['GET', 'POST'])
+@app.route('/tambah', methods=['GET', 'POST'])
 def add_student():
     if request.method == 'POST':
         nim = request.form['nim']
@@ -48,8 +48,7 @@ def add_student():
         except Exception as e:
             db.session.rollback()
             flash('Gagal menambahkan data. Pastikan NIM belum terdaftar.', 'danger')
-
-    return render_template('add.html')
+            return redirect(url_for('index'))
 
 
 # UPDATE: Mengedit data yang ada
