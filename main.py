@@ -1,8 +1,10 @@
+import os
+
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "kunci-rahasia-flask-crud"
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "kunci-rahasia-flask-crud")
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -32,7 +34,7 @@ def index():
 
 # create : menambah data baru
 @app.route('/tambah', methods=['GET', 'POST'])
-def add_student():
+def tambah():
     if request.method == 'POST':
         nim = request.form['nim']
         nama = request.form['nama']
@@ -45,18 +47,19 @@ def add_student():
             db.session.commit()
             flash('Data mahasiswa berhasil ditambahkan!', 'success')
             return redirect(url_for('index'))
-        except Exception as e:
+        except Exception:
             db.session.rollback()
             flash('Gagal menambahkan data. Pastikan NIM belum terdaftar.', 'danger')
             return redirect(url_for('index'))
+    return redirect(url_for('index'))
 
 
 # UPDATE: Mengedit data yang ada
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit_student(id):
     student = Student.query.get_or_404(id)
-    if request.method == ("POST"):
-        student.nim = request.form[')nim']
+    if request.method == 'POST':
+        student.nim = request.form['nim']
         student.nama = request.form['nama']
         student.email = request.form['email']
         student.jurusan = request.form['jurusan']
@@ -65,11 +68,20 @@ def edit_student(id):
             db.session.commit()
             flash('Data mahasiswa berhasil diperbarui!', 'success')
             return redirect(url_for('index'))
-        except Exception as e:
+        except Exception:
             db.session.rollback()
             flash('Gagal memperbarui data. Periksa kembali NIM.', 'danger')
 
     return render_template('edit.html', student=student)
+
+
+@app.route('/hapus/<int:id>')
+def hapus(id):
+    student = Student.query.get_or_404(id)
+    db.session.delete(student)
+    db.session.commit()
+    flash('Data mahasiswa berhasil dihapus!', 'success')
+    return redirect(url_for('index'))
 
 
 # Press the green button in the gutter to run the script.
