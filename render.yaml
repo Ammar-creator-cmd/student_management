@@ -2,6 +2,7 @@ services:
   - type: web
     name: student-management
     runtime: python
+    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn main:app
     envVars:
