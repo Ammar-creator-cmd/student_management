@@ -8,6 +8,7 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "kunci-rahasia-flask-cru
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+os.makedirs(app.instance_path, exist_ok=True)
 db = SQLAlchemy(app)
 
 
